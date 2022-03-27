@@ -19,8 +19,7 @@ class MySqlConnection:
 	def __init__(self, user, password, host="localhost"):
 
 		# Connect to a MySQL database		
-		self.db = FakeConnect(host, user, password)
-		# self.db = mysql.connector.connect(host=host, user=user, password=password)
+		self.db = FakeConnect(host, user, password) # self.db = mysql.connector.connect(host=host, user=user, password=password)
 
 		# Initialize a cursor object that executes SQL operations
 		self.cursor = self.db.cursor()
@@ -34,4 +33,5 @@ class MySqlConnection:
 		else:
 			self.cursor.execute(commandString)
 			return True
-	
+
+
