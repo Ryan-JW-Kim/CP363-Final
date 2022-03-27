@@ -1,9 +1,8 @@
-from tkinter import Y
 from userInputManager import *
 from mySQLconnector import * 
 
-USER = "Test"
-PASSWORD = "TEST"
+USER = "USERNAME"
+PASSWORD = "PASSWORD"
 
 def main():
 	
@@ -29,6 +28,8 @@ def main():
 
 if __name__ == "__main__":
 
-	print(f"----Starting User-DB interaction----")
+	print(f"----Starting User-DB interaction----\n")
 	main()
-	print(f"----Ending User-DB interaction------")
+	print(f"\n----Ending User-DB interaction------")
+
+
