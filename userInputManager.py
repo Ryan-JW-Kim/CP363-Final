@@ -1,5 +1,3 @@
-from datetime import datetime
-import email
 
 class UserInput:
 
@@ -7,11 +5,16 @@ class UserInput:
 		self.breakpoint = False
 
 	def receive_command(self) -> dict:
+		"""
+		UserInput.receive_command() called in main.py this method uses python's input() method
+		to generate a dictionary containing user query data.
+		"""
 
 		myDict = {}
 
 		msg = "Add, Remove, CreateTable, Select, CreateDatabase -> "
 		command = input(msg)
+		print()
 
 		if command == "Remove":
 
@@ -61,7 +64,9 @@ class UserInput:
 				yearPublished = input("Year Published -> ")
 				sectionID = input("What sectionID does this belong too -> ")
 				eNumber = input("Edition Number -> ")
+				bookID = input("What is the bookID -> ")				
 
+				myDict["bookID"] = bookID
 				myDict["target"] = command
 				myDict["genre"] = genre
 				myDict["title"] = title
@@ -78,7 +83,7 @@ class UserInput:
 				lname = input("User\'s last name -> ")
 				email = input("User\'s email address -> ")
 				telephone = input("User\'s telephone number -> ")
-				address = input("User\' address -> ")
+				address = input("User\'s address -> ")
 				pCode = input("User\'s postal code -> ")
 				city = input("User\'s city -> ")
 				userSince = datetime.now().date().__str__()
@@ -148,7 +153,12 @@ class UserInput:
 
 		return myDict
 
-	def parse_to_SQL(self, command):
+	def parse_to_SQL(self, command: dict) -> str:
+		"""
+		UserInput().parse_to_SQL(cmd) called in main.py this method uses a dictionary created
+		through UserInput.receive_command() to generate a string representing a SQL query to be
+		passed to the mysql.connector.connect().cursor().execute(QUERY) method.
+		"""
 
 		rtn_str = None
 
@@ -160,7 +170,7 @@ class UserInput:
 
 			if command["target"] == "Book":
 
-				_id = command["id"]
+				_id = command["bookID"]
 				title = command["title"]
 				author = command["author"]
 				publisher = command["publisher"]
@@ -221,19 +231,24 @@ class UserInput:
 			elif command["target"] == "Section":
 
 				_id = command["id"]
-				rtn_str = f"DELETE FROM library.user WHERE SECTION_ID=\'{_id}\'"
+				rtn_str = f"DELETE FROM library.section WHERE SECTION_ID=\'{_id}\'"
 
 			elif command["target"] == "Libarian":
 
 				_id = command["id"]
-				rtn_str = f"DELETE FROM library.user WHERE SECTION_ID=\'{_id}\'"
+				rtn_str = f"DELETE FROM library.librarian WHERE SECTION_ID=\'{_id}\'"
 
 			else:
 				print("Error")
 				self.breakpoint = True
 
 		elif command["type"] == "Select":
-			if command["target"] == "Book":
+
+			if "target" not in command.keys():
+				print("Error, unexpected key")
+				self.breakpoint = True
+
+			elif command["target"] == "Book":
 
 				_id = command["id"]
 				rtn_str = f"SELECT * FROM library.book WHERE BOOK_ID=\'{_id}\'"
@@ -260,16 +275,16 @@ class UserInput:
 		elif command["type"] == "CreateTable":
 
 			if command["target"] == "Book":
-				rtn_str = "CREATE TABLE `book` (\`BOOK_ID\` int NOT NULL, \`TITLE\` varchar(100) NOT NULL, \`AUTHOR\` varchar(100) NOT NULL, \`PUBLISHER\` varchar(100) NOT NULL, \`YEAR_PUBLISHED\` int NOT NULL, \`EDITION_NUM\` varchar(100) NOT NULL, `GENRE\` varchar(100) NOT NULL, \`STATUS\` varchar(30) NOT NULL, \`SECTION_ID\` int NOT NULL, PRIMARY KEY (`BOOK_ID`))"
+				rtn_str = "CREATE TABLE `book` (`BOOK_ID` int NOT NULL, `TITLE` varchar(100) NOT NULL, `AUTHOR` varchar(100) NOT NULL, `PUBLISHER` varchar(100) NOT NULL, `YEAR_PUBLISHED` int NOT NULL, `EDITION_NUM` varchar(100) NOT NULL, `GENRE` varchar(100) NOT NULL, `STATUS` varchar(30) NOT NULL, `SECTION_ID` int NOT NULL, PRIMARY KEY (`BOOK_ID`))"
 
 			elif command["target"] == "User":
-				rtn_str  = "CREATE TABLE `user` (\`USER_ID\` int NOT NULL, \`FIRST_NAME\` varchar(100) NOT NULL, \`LAST_NAME\` varchar(100) NOT NULL, \`EMAIL\` varchar(100) NOT NULL, \`TELEPHONE\` bigint NOT NULL, \`ADDRESS\` varchar(100) NOT NULL, \`POSTAL_CODE\` varchar(6) NOT NULL, \`CITY\` varchar(100) NOT NULL,\`USER_SINCE\` date NOT NULL, \`OVERDUE_AMOUNT\` decimal(19,2) NOT NULL, PRIMARY KEY (\`USER_ID\`))"
+				rtn_str  = "CREATE TABLE `user` (`USER_ID` int NOT NULL, `FIRST_NAME` varchar(100) NOT NULL, `LAST_NAME` varchar(100) NOT NULL, `EMAIL` varchar(100) NOT NULL, `TELEPHONE` bigint NOT NULL, `ADDRESS` varchar(100) NOT NULL, 'POSTAL_CODE` varchar(6) NOT NULL, `CITY` varchar(100) NOT NULL,`USER_SINCE` date NOT NULL, `OVERDUE_AMOUNT` decimal(19,2) NOT NULL, PRIMARY KEY (`USER_ID`))"
 
 			elif command["target"] == "Section":
-				rtn_str = "CREATE TABLE `section` (\`SECTION_ID\` int NOT NULL, \`LIBRARIAN_ID\` int NOT NULL, PRIMARY KEY (\`SECTION_ID\`)"
+				rtn_str = "CREATE TABLE `section` (`SECTION_ID` int NOT NULL, `LIBRARIAN_ID` int NOT NULL, PRIMARY KEY (`SECTION_ID`)"
 
 			elif command["target"] == "Librarian":
-				rtn_str = "CREATE TABLE `librarian` (\`LIBRARIAN_ID\` int NOT NULL, \`FIRST_NAME\` varchar(100) NOT NULL, \`LAST_NAME\` varchar(100) NOT NULL, \`RESPONSIBILITY\` varchar(100) NOT NULL, \`START_TIME\` time NOT NULL, \`END_TIME\` time NOT NULL, PRIMARY KEY (\`LIBRARIAN_ID\`))"
+				rtn_str = "CREATE TABLE `librarian` (`LIBRARIAN_ID` int NOT NULL, `FIRST_NAME` varchar(100) NOT NULL, `LAST_NAME` varchar(100) NOT NULL, `RESPONSIBILITY` varchar(100) NOT NULL, `START_TIME` time NOT NULL, `END_TIME` time NOT NULL, PRIMARY KEY (`LIBRARIAN_ID`))"
 			
 			else:
 				print("Error")
@@ -283,3 +298,5 @@ class UserInput:
 			self.breakpoint = True
 
 		return rtn_str
+
+
